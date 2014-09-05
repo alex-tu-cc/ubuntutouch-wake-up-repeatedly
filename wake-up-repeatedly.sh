@@ -6,7 +6,7 @@
 # !!!!! Not complete, pending currently.
 
 # 6 mins
-WAKE_PEROID=120
+WAKE_PEROID=360
 counter=0
 START_TIME=`date +%s`
 CUR_TIME=$START_TIME
@@ -50,7 +50,7 @@ do
     sleep_secs=$(get_random_secs)
 
     # Alex test
-    sleep_secs=120
+    sleep_secs=360
 
  #   logger "sleep $sleep_secs"
     #let "PASSED_TIME = `date +%s` - $START_TIME"
