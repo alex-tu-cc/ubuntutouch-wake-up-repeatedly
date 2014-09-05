@@ -1,13 +1,17 @@
 #!/bin/dash
 #Because of device suspend will interfere with the sleep time of user process.
 #So the strategy of this script is to wake up device every $WAKE_PERIOD.
-#And let this script to check the passed time every 6 mins.
+#And let this script to check the passed time every 2 secs.
 #So the max time shift of issuing power button event is $WAKE_PERIOD + 6 minutes.
 # !!!!! Not complete, pending currently.
 
+# 6 mins
+WAKE_PEROID=120
 counter=0
 START_TIME=`date +%s`
+CUR_TIME=$START_TIME
 PASSED_TIME=0
+DURATION=0
 # get random seconds from 10 ~ 1800
 #RANG=$PWR_KEY_TIME_RANGE
 RANG=180
@@ -46,19 +50,27 @@ do
     sleep_secs=$(get_random_secs)
 
     # Alex test
-    sleep_secs=720
+    sleep_secs=120
 
  #   logger "sleep $sleep_secs"
     #let "PASSED_TIME = `date +%s` - $START_TIME"
     PASSED_TIME=$((`date +%s` - $START_TIME))
 #   logger "$PASSED_TIME seconds passed ..."
-    logger $0 "$counter times: $PASSED_TIME seconds passed, will sleep $sleep_secs seconds."
-    echo "`date` $counter times: $PASSED_TIME seconds passed, will sleep $sleep_secs seconds." >> /home/test.log
+    logger $0 "$counter times: sleeped $DURATION secs, $PASSED_TIME seconds passed, will sleep $sleep_secs seconds."
+    echo "`date` $counter times: sleeped $DURATION secs, $PASSED_TIME seconds passed, will sleep $sleep_secs seconds." >> /home/test.log
 
+    powerd-cli wakeup $WAKE_PEROID
+    CUR_TIME=$((`date +%s`))
 
-    powerd-cli wakeup $sleep_secs
+    while [ $DURATION -lt $sleep_secs ]
+    do 
+#    	sleep $sleep_secs
+	sleep 2
+	DURATION=$((`date +%s` - $CUR_TIME))                                                                                                                                                                                       
+#	echo  $DURATION
+    done
+	DURATION=$((0))                                                                                                                                                                                       
     /usr/bin/press_pwr_key.o
-    sleep $sleep_secs
     #sleep 2
 done
 
